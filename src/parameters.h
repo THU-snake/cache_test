@@ -63,7 +63,6 @@ public:
     typedef std::array<u_int32_t,LINEWORDS> cache_line_t;
 };
 
-#endif
 #define SC_INCLUDE_DYNAMIC_PROCESSES
 #define SPIKE_OUTPUT
 #include "systemc.h"
