@@ -2,7 +2,7 @@
 #define DATA_ARRAY_H
 
 #include "utils.h"
-#include "parameter.h"
+#include "parameters.h"
 #include "interfaces.h"
 #include <iomanip>
 #include <bitset>
