@@ -53,3 +53,4 @@ SC_MODULE(L2Cache) {
         }
     }
 };
+#endif
