@@ -1,3 +1,6 @@
+#ifndef L1_MODEL_SC_H
+#define L1_MODEL_SC_H
+
 #include <systemc.h>
 #include "l1_data_cache.h"
 
