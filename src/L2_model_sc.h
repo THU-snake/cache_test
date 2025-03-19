@@ -1,3 +1,6 @@
+#ifndef L2_MODEL_SC_H
+#define L2_MODEL_SC_H
+
 #include <systemc.h>
 #include "DEBUG_L2_model.h"
 
