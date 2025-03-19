@@ -2,7 +2,7 @@
 #define INTERFACES_H
 
 #include <deque>
-#include "parameter.h"
+#include "parameters.h"
 
 enum LSU_cache_coreReq_opcode {
     Read,
