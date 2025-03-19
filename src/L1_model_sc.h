@@ -187,3 +187,4 @@ void trace_signals(sc_trace_file* tf) {
     sc_trace(tf, l1_cache.mem_req, "mem_req");
     sc_trace(tf, l1_cache.mem_rsp, "mem_rsp");
 }
+#endif
