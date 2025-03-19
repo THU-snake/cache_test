@@ -10,7 +10,7 @@
 #include <bitset>
 
 #include "utils.h"
-#include "parameter.h"
+#include "parameters.h"
 #include "interfaces.h"
 
 enum tag_access_status {
