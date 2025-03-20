@@ -93,6 +93,16 @@ struct dcache_2_L2_memReq : cache_building_block {
     std::array<bool,LINEWORDS> a_mask;
     //bool a_data;//only to indicate whether there is a data transaction
     cache_line_t a_data;
+    
+    bool valid; // 假设有个标志表示有效性
+    // 其它成员...
+
+    bool is_valid() const { return valid; }
+
+    bool operator==(const dcache_2_L2_memReq &other) const {
+        // 根据具体的成员进行比较
+        return valid == other.valid /* && 其它成员的比较 */;
+    }
 };
 
 //memReq_Q include W from cReq, dirty replace, or flush et.al
