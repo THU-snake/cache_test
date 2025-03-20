@@ -19,7 +19,7 @@ SC_MODULE(L2Cache) {
     // L2 缓存实例
     DEBUG_L2_model l2_cache;
 
-    SC_CTOR(L2Cache) : l2_cache("l2_cache", 1) { // 传递名称和 verbose_level
+    SC_CTOR(L2Cache) : l2_cache(1) { // 传递名称和 verbose_level
         // 注册进程
         SC_METHOD(process_mem_req);
         sensitive << clk.posedge_event(); // 使用 posedge_event() 替代 pos()
