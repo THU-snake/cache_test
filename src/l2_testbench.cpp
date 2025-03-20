@@ -141,7 +141,7 @@ SC_MODULE(L2Testbench) {
         // 验证响应数量
         int resp_count = 0;
         while (!l2_cache.return_Q_is_empty()) {
-            l2_cache.DEBUG_serial_pop();
+            L2_2_dcache_memRsp.DEBUG_serial_pop();
             resp_count++;
         }
         if (resp_count == 2) {
