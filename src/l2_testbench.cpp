@@ -3,81 +3,80 @@
 
 SC_MODULE(L2Testbench) {
     //--------------------------
-    // ¶Ë¿ÚºÍĞÅºÅ¶¨Òå
+    // ç«¯å£å’Œä¿¡å·å®šä¹‰
     //--------------------------
-    sc_clock clk;                          // Ê±ÖÓĞÅºÅ
-    sc_signal<bool> reset;                 // ¸´Î»ĞÅºÅ
-    sc_signal<dcache_2_L2_memReq> mem_req; // L1 -> L2 µÄÇëÇó
-    sc_signal<L2_2_dcache_memRsp> mem_rsp; // L2 -> L1 µÄÏìÓ¦
+    sc_clock clk;                          // æ—¶é’Ÿä¿¡å·
+    sc_signal<bool> reset;                 // å¤ä½ä¿¡å·
+    sc_signal<dcache_2_L2_memReq> mem_req; // L1 -> L2 çš„è¯·æ±‚
+    sc_signal<L2_2_dcache_memRsp> mem_rsp; // L2 -> L1 çš„å“åº”
 
     //--------------------------
-    // ´ı²âÄ£¿éÊµÀı
+    // å¾…æµ‹æ¨¡å—å®ä¾‹
     //--------------------------
-    DEBUG_L2_model l2_cache;
+    L2Cache l2_cache; // ä½¿ç”¨ L2Cache æ¨¡å—
 
     //--------------------------
-    // ¹¹Ôìº¯Êı
+    // æ„é€ å‡½æ•°
     //--------------------------
     SC_CTOR(L2Testbench)
-        : clk("clk", 10, SC_NS)
-        , // 100MHz Ê±ÖÓ
-        l2_cache("l2_cache") {
-        // Á¬½Ó¶Ë¿Ú
+        : clk("clk", 10, SC_NS), // 100MHz æ—¶é’Ÿ
+          l2_cache("l2_cache") {
+        // è¿æ¥ç«¯å£
         l2_cache.clk(clk);
         l2_cache.reset(reset);
         l2_cache.mem_req(mem_req);
         l2_cache.mem_rsp(mem_rsp);
 
-        // ×¢²á²âÊÔ½ø³Ì
+        // æ³¨å†Œæµ‹è¯•è¿›ç¨‹
         SC_THREAD(run_tests);
-        sensitive << clk.pos();
+        sensitive << clk.posedge_event(); // ä½¿ç”¨ posedge_event() æ›¿ä»£ pos()
     }
 
     //--------------------------
-    // ²âÊÔÖ÷Âß¼­
+    // æµ‹è¯•ä¸»é€»è¾‘
     //--------------------------
     void run_tests() {
-        // ²âÊÔÓÃÀı 1: »ù´¡¶ÁÈ¡£¨»º´æÃüÖĞ£©
+        // æµ‹è¯•ç”¨ä¾‹ 1: åŸºç¡€è¯»å–ï¼ˆç¼“å­˜å‘½ä¸­ï¼‰
         test_read_hit(0x1000);
 
-        // ²âÊÔÓÃÀı 2: »ù´¡Ğ´Èë£¨»º´æÈ±Ê§£©
+        // æµ‹è¯•ç”¨ä¾‹ 2: åŸºç¡€å†™å…¥ï¼ˆç¼“å­˜ç¼ºå¤±ï¼‰
         test_write_miss(0x2000, 0x12345678);
 
-        // ²âÊÔÓÃÀı 3: ²¢·¢ÇëÇó²âÊÔ
+        // æµ‹è¯•ç”¨ä¾‹ 3: å¹¶å‘è¯·æ±‚æµ‹è¯•
         test_concurrent_access();
 
-        // ½áÊø·ÂÕæ
+        // ç»“æŸä»¿çœŸ
         sc_stop();
     }
 
     //--------------------------
-    // ²âÊÔÓÃÀı 1: ¶ÁÈ¡ÃüÖĞ
+    // æµ‹è¯•ç”¨ä¾‹ 1: è¯»å–å‘½ä¸­
     //--------------------------
     void test_read_hit(uint32_t addr) {
         std::cout << "===== Test 1: Read Hit =====" << std::endl;
 
-        // ²½Öè 1: ¸´Î»
+        // æ­¥éª¤ 1: å¤ä½
         reset.write(true);
         wait(2, SC_NS);
         reset.write(false);
         wait(10, SC_NS);
 
-        // ²½Öè 2: ·¢ËÍ Get ÇëÇó
+        // æ­¥éª¤ 2: å‘é€ Get è¯·æ±‚
         dcache_2_L2_memReq req;
         req.a_opcode = Get;
-        req.a_param = 0x0;     // ³£¹æ¶ÁÈ¡
-        req.a_source = 1;      // ÇëÇóÔ´±êÊ¶
-        req.a_address = addr;  // µØÖ· 0x1000
-        req.a_mask.fill(true); // È«×ÖÑÚÂë
-        req.a_data.fill(0);    // ¶ÁÈ¡Ê±Êı¾İÎŞĞ§
+        req.a_param = 0x0;     // å¸¸è§„è¯»å–
+        req.a_source = 1;      // è¯·æ±‚æºæ ‡è¯†
+        req.a_address = addr;  // åœ°å€ 0x1000
+        req.a_mask.fill(true); // å…¨å­—æ©ç 
+        req.a_data.fill(0);    // è¯»å–æ—¶æ•°æ®æ— æ•ˆ
 
         mem_req.write(req);
         wait(clk.posedge_event());
 
-        // ²½Öè 3: µÈ´ıÏìÓ¦£¨¼ÙÉè L2 ÑÓ³ÙÎª 3 ÖÜÆÚ£©
+        // æ­¥éª¤ 3: ç­‰å¾…å“åº”ï¼ˆå‡è®¾ L2 å»¶è¿Ÿä¸º 3 å‘¨æœŸï¼‰
         wait(3 * clk.period());
 
-        // ²½Öè 4: ÑéÖ¤ÏìÓ¦
+        // æ­¥éª¤ 4: éªŒè¯å“åº”
         if (mem_rsp.read().d_opcode == AccessAckData) {
             std::cout << "[PASS] Read Hit at 0x" << std::hex << addr << ", Data: 0x" << mem_rsp.read().d_data[0]
                       << std::endl;
@@ -87,27 +86,27 @@ SC_MODULE(L2Testbench) {
     }
 
     //--------------------------
-    // ²âÊÔÓÃÀı 2: Ğ´ÈëÈ±Ê§
+    // æµ‹è¯•ç”¨ä¾‹ 2: å†™å…¥ç¼ºå¤±
     //--------------------------
     void test_write_miss(uint32_t addr, uint32_t data) {
         std::cout << "===== Test 2: Write Miss =====" << std::endl;
 
-        // ²½Öè 1: ·¢ËÍ PutFullData ÇëÇó
+        // æ­¥éª¤ 1: å‘é€ PutFullData è¯·æ±‚
         dcache_2_L2_memReq req;
         req.a_opcode = PutFullData;
         req.a_param = 0x0;
         req.a_source = 2;
         req.a_address = addr;
         req.a_mask.fill(true);
-        req.a_data[0] = data; // Ğ´ÈëÊı¾İ 0x12345678
+        req.a_data[0] = data; // å†™å…¥æ•°æ® 0x12345678
 
         mem_req.write(req);
         wait(clk.posedge_event());
 
-        // ²½Öè 2: µÈ´ıÏìÓ¦£¨¼ÙÉè L2 ÑÓ³ÙÎª 3 ÖÜÆÚ£©
+        // æ­¥éª¤ 2: ç­‰å¾…å“åº”ï¼ˆå‡è®¾ L2 å»¶è¿Ÿä¸º 3 å‘¨æœŸï¼‰
         wait(3 * clk.period());
 
-        // ²½Öè 3: ÑéÖ¤ÏìÓ¦
+        // æ­¥éª¤ 3: éªŒè¯å“åº”
         if (mem_rsp.read().d_opcode == AccessAck) {
             std::cout << "[PASS] Write Miss at 0x" << std::hex << addr << std::endl;
         } else {
@@ -116,30 +115,30 @@ SC_MODULE(L2Testbench) {
     }
 
     //--------------------------
-    // ²âÊÔÓÃÀı 3: ²¢·¢ÇëÇó²âÊÔ
+    // æµ‹è¯•ç”¨ä¾‹ 3: å¹¶å‘è¯·æ±‚æµ‹è¯•
     //--------------------------
     void test_concurrent_access() {
         std::cout << "===== Test 3: Concurrent Access =====" << std::endl;
 
-        // ²½Öè 1: Í¬Ê±·¢ËÍÁ½¸öÇëÇó£¨²âÊÔÖÙ²ÃÂß¼­£©
+        // æ­¥éª¤ 1: åŒæ—¶å‘é€ä¸¤ä¸ªè¯·æ±‚ï¼ˆæµ‹è¯•ä»²è£é€»è¾‘ï¼‰
         dcache_2_L2_memReq req1, req2;
         req1.a_opcode = Get;
         req1.a_address = 0x3000;
         req2.a_opcode = Get;
         req2.a_address = 0x4000;
 
-        // ÏÈ·¢ËÍµÚÒ»¸öÇëÇó
+        // å…ˆå‘é€ç¬¬ä¸€ä¸ªè¯·æ±‚
         mem_req.write(req1);
         wait(clk.posedge_event());
 
-        // ÔÚÎ´Íê³ÉÊ±·¢ËÍµÚ¶ş¸öÇëÇó£¨²âÊÔÊÇ·ñ»á×èÈû£©
+        // åœ¨æœªå®Œæˆæ—¶å‘é€ç¬¬äºŒä¸ªè¯·æ±‚ï¼ˆæµ‹è¯•æ˜¯å¦ä¼šé˜»å¡ï¼‰
         mem_req.write(req2);
         wait(clk.posedge_event());
 
-        // µÈ´ıÁ½¸öÏìÓ¦
+        // ç­‰å¾…ä¸¤ä¸ªå“åº”
         wait(6 * clk.period());
 
-        // ÑéÖ¤ÏìÓ¦ÊıÁ¿
+        // éªŒè¯å“åº”æ•°é‡
         int resp_count = 0;
         while (!l2_cache.return_Q_is_empty()) {
             l2_cache.DEBUG_serial_pop();
@@ -152,23 +151,24 @@ SC_MODULE(L2Testbench) {
         }
     }
 };
+
 int sc_main(int argc, char* argv[]) {
-    // ´´½¨²¨ĞÎÎÄ¼ş
+    // åˆ›å»ºæ³¢å½¢æ–‡ä»¶
     sc_trace_file* tf = sc_create_vcd_trace_file("l2_cache_wave");
 
-    // ÊµÀı»¯²âÊÔÆ½Ì¨
+    // å®ä¾‹åŒ–æµ‹è¯•å¹³å°
     L2Testbench tb("tb");
 
-    // ¸ú×Ù¹Ø¼üĞÅºÅ
+    // è·Ÿè¸ªå…³é”®ä¿¡å·
     sc_trace(tf, tb.clk, "clk");
     sc_trace(tf, tb.reset, "reset");
     sc_trace(tf, tb.mem_req, "mem_req");
     sc_trace(tf, tb.mem_rsp, "mem_rsp");
 
-    // Æô¶¯·ÂÕæ
+    // å¯åŠ¨ä»¿çœŸ
     sc_start(200, SC_NS);
 
-    // ¹Ø±Õ²¨ĞÎÎÄ¼ş
+    // å…³é—­æ³¢å½¢æ–‡ä»¶
     sc_close_vcd_trace_file(tf);
     return 0;
 }
