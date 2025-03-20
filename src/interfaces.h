@@ -95,10 +95,6 @@ struct dcache_2_L2_memReq : cache_building_block {
     cache_line_t a_data;
     
 
-    bool operator==(const dcache_2_L2_memReq &other) const {
-        // 根据具体的成员进行比较
-        return valid == other.valid /* && 其它成员的比较 */;
-    }
 };
 
 //memReq_Q include W from cReq, dirty replace, or flush et.al
