@@ -47,7 +47,7 @@ SC_MODULE(L2Cache) {
     // 进程：生成内存响应
     void process_mem_rsp() {
         if (!l2_cache.return_Q_is_empty()) {
-            mem_rsp.write(l2_cache.DEBUG_serial_pop());
+            mem_rsp.write(L2_2_dcache_memRsp.DEBUG_serial_pop());
             rsp_ready.write(true);
         } else {
             rsp_ready.write(false);
